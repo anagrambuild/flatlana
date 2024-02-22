@@ -7,6 +7,9 @@ An example of using flatbuffers on solana
 * A computing device (if you are stuck here, um.. turnaround and go back to bed)
 * Solana tools (find them yourself)
 * FlatC (im not googling this for you)
+* Rust (if you are here you should know how to get this)
+* pnpm ( because the world needs another package manager)
+* Some time to kill (if you have a family, instead spend time with them, they miss you)
 
 ### Why
 I was bored with borsh and I love pain so I wanted to show how life can be hard with flatbuffers on solana. All jokes aside you get a zero copy deserialization and a very fast serialization. Along with that you get a cross platform schema definition which makes client generation fast. 

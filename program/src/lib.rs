@@ -41,8 +41,7 @@ pub fn process_instruction<'a>(
             if let Some(dee) = ix.instruction_as_dee_v1() {
                 // example of saving the bytes using
                 let bump = 254;
-                let seeds = &[&b"flatlana"[..], &accounts[0].key.to_bytes()];
-                
+                let seeds = &[&b"flatlana"[..], &accounts[0].key.to_bytes(), &[bump]];
                 // sneakily grab the underlying table at offset where dee starts
                 let bytes = dee._tab.buf();
                 let space = bytes.len() as u64;
