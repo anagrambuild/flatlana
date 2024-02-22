@@ -1,0 +1,13 @@
+include "./tweedle_dee.fbs"; 
+include "./tweedle_dum.fbs";
+
+union FlatlanaInstructionData {
+  DeeV1: TweedleDeeV1,
+  DumV1: TweedleDumV1,
+} 
+
+table FlatlanaInstruction{
+  instruction: FlatlanaInstructionData;
+}
+
+root_type FlatlanaInstruction;

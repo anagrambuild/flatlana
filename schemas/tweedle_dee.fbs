@@ -1,0 +1,9 @@
+
+
+table TweedleDeeV1 {
+  the_string: string;
+  the_int: int;
+}
+
+
+root_type TweedleDeeV1;

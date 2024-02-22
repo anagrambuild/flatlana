@@ -1,0 +1,15 @@
+[package]
+name = "flatlana-types"
+version = "0.0.1"
+description = "Flatalana types for Rust"
+authors = ["anagram build team"]
+repository = "https://github.com/anagrambuild/flatlana"
+license = "MIT"
+edition = "2021"
+
+[dependencies]
+flatbuffers = {workspace = true}
+thiserror = {workspace = true}
+
+[lints]
+workspace = true

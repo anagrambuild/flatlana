@@ -1,0 +1,13 @@
+[package]
+name = "flatlana-program"
+version = "0.0.1"
+description = "Flatalana program"
+authors = ["anagram build team"]
+repository = "https://github.com/anagrambuild/flatlana"
+license = "MIT"
+edition = "2021"
+
+[dependencies]
+solana-program = {workspace = true}
+flatlana-types = {path = "../schemas-rust"}
+thiserror = { workspace = true }

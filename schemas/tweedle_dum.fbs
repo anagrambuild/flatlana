@@ -1,0 +1,9 @@
+
+
+table TweedleDumV1 {
+  the_slice: [uint8];
+  the_bool: bool;
+}
+
+
+root_type TweedleDumV1;
