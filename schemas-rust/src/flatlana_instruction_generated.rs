@@ -12,44 +12,44 @@ extern crate flatbuffers;
 use self::flatbuffers::{EndianScalar, Follow};
 
 #[deprecated(since = "2.0.0", note = "Use associated constants instead. This will no longer be generated in 2021.")]
-pub const ENUM_MIN_FLATLANA_INSTRUCTION_DATA: u8 = 0;
+pub const ENUM_MIN_INSTRUCTION_TYPE: u8 = 0;
 #[deprecated(since = "2.0.0", note = "Use associated constants instead. This will no longer be generated in 2021.")]
-pub const ENUM_MAX_FLATLANA_INSTRUCTION_DATA: u8 = 2;
+pub const ENUM_MAX_INSTRUCTION_TYPE: u8 = 2;
 #[deprecated(since = "2.0.0", note = "Use associated constants instead. This will no longer be generated in 2021.")]
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_FLATLANA_INSTRUCTION_DATA: [FlatlanaInstructionData; 3] = [
-  FlatlanaInstructionData::NONE,
-  FlatlanaInstructionData::DeeV1,
-  FlatlanaInstructionData::DumV1,
+pub const ENUM_VALUES_INSTRUCTION_TYPE: [InstructionType; 3] = [
+  InstructionType::Unknown,
+  InstructionType::DeeV1,
+  InstructionType::DumV1,
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 #[repr(transparent)]
-pub struct FlatlanaInstructionData(pub u8);
+pub struct InstructionType(pub u8);
 #[allow(non_upper_case_globals)]
-impl FlatlanaInstructionData {
-  pub const NONE: Self = Self(0);
+impl InstructionType {
+  pub const Unknown: Self = Self(0);
   pub const DeeV1: Self = Self(1);
   pub const DumV1: Self = Self(2);
 
   pub const ENUM_MIN: u8 = 0;
   pub const ENUM_MAX: u8 = 2;
   pub const ENUM_VALUES: &'static [Self] = &[
-    Self::NONE,
+    Self::Unknown,
     Self::DeeV1,
     Self::DumV1,
   ];
   /// Returns the variant's name or "" if unknown.
   pub fn variant_name(self) -> Option<&'static str> {
     match self {
-      Self::NONE => Some("NONE"),
+      Self::Unknown => Some("Unknown"),
       Self::DeeV1 => Some("DeeV1"),
       Self::DumV1 => Some("DumV1"),
       _ => None,
     }
   }
 }
-impl core::fmt::Debug for FlatlanaInstructionData {
+impl core::fmt::Debug for InstructionType {
   fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
     if let Some(name) = self.variant_name() {
       f.write_str(name)
@@ -58,7 +58,7 @@ impl core::fmt::Debug for FlatlanaInstructionData {
     }
   }
 }
-impl<'a> flatbuffers::Follow<'a> for FlatlanaInstructionData {
+impl<'a> flatbuffers::Follow<'a> for InstructionType {
   type Inner = Self;
   #[inline]
   unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
@@ -67,15 +67,15 @@ impl<'a> flatbuffers::Follow<'a> for FlatlanaInstructionData {
   }
 }
 
-impl flatbuffers::Push for FlatlanaInstructionData {
-    type Output = FlatlanaInstructionData;
+impl flatbuffers::Push for InstructionType {
+    type Output = InstructionType;
     #[inline]
     unsafe fn push(&self, dst: &mut [u8], _written_len: usize) {
         flatbuffers::emplace_scalar::<u8>(dst, self.0);
     }
 }
 
-impl flatbuffers::EndianScalar for FlatlanaInstructionData {
+impl flatbuffers::EndianScalar for InstructionType {
   type Scalar = u8;
   #[inline]
   fn to_little_endian(self) -> u8 {
@@ -89,7 +89,7 @@ impl flatbuffers::EndianScalar for FlatlanaInstructionData {
   }
 }
 
-impl<'a> flatbuffers::Verifiable for FlatlanaInstructionData {
+impl<'a> flatbuffers::Verifiable for InstructionType {
   #[inline]
   fn run_verifier(
     v: &mut flatbuffers::Verifier, pos: usize
@@ -99,9 +99,7 @@ impl<'a> flatbuffers::Verifiable for FlatlanaInstructionData {
   }
 }
 
-impl flatbuffers::SimpleToVerifyInSlice for FlatlanaInstructionData {}
-pub struct FlatlanaInstructionDataUnionTableOffset {}
-
+impl flatbuffers::SimpleToVerifyInSlice for InstructionType {}
 pub enum FlatlanaInstructionOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -118,8 +116,9 @@ impl<'a> flatbuffers::Follow<'a> for FlatlanaInstruction<'a> {
 }
 
 impl<'a> FlatlanaInstruction<'a> {
-  pub const VT_INSTRUCTION_TYPE: flatbuffers::VOffsetT = 4;
-  pub const VT_INSTRUCTION: flatbuffers::VOffsetT = 6;
+  pub const VT_IX_TYPE: flatbuffers::VOffsetT = 4;
+  pub const VT_DEEV1: flatbuffers::VOffsetT = 6;
+  pub const VT_DUMV1: flatbuffers::VOffsetT = 8;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -128,59 +127,55 @@ impl<'a> FlatlanaInstruction<'a> {
   #[allow(unused_mut)]
   pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
     _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
-    args: &'args FlatlanaInstructionArgs
+    args: &'args FlatlanaInstructionArgs<'args>
   ) -> flatbuffers::WIPOffset<FlatlanaInstruction<'bldr>> {
     let mut builder = FlatlanaInstructionBuilder::new(_fbb);
-    if let Some(x) = args.instruction { builder.add_instruction(x); }
-    builder.add_instruction_type(args.instruction_type);
+    if let Some(x) = args.dumv1 { builder.add_dumv1(x); }
+    if let Some(x) = args.deev1 { builder.add_deev1(x); }
+    builder.add_ix_type(args.ix_type);
     builder.finish()
   }
 
 
   #[inline]
-  pub fn instruction_type(&self) -> FlatlanaInstructionData {
+  pub fn ix_type(&self) -> InstructionType {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<FlatlanaInstructionData>(FlatlanaInstruction::VT_INSTRUCTION_TYPE, Some(FlatlanaInstructionData::NONE)).unwrap()}
+    unsafe { self._tab.get::<InstructionType>(FlatlanaInstruction::VT_IX_TYPE, Some(InstructionType::Unknown)).unwrap()}
   }
   #[inline]
-  pub fn instruction(&self) -> Option<flatbuffers::Table<'a>> {
+  pub fn deev1(&self) -> Option<flatbuffers::Vector<'a, u8>> {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Table<'a>>>(FlatlanaInstruction::VT_INSTRUCTION, None)}
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, u8>>>(FlatlanaInstruction::VT_DEEV1, None)}
+  }
+  pub fn deev1_nested_flatbuffer(&'a self) -> Option<TweedleDeeV1<'a>> {
+    self.deev1().map(|data| {
+      use flatbuffers::Follow;
+      // Safety:
+      // Created from a valid Table for this object
+      // Which contains a valid flatbuffer in this slot
+      unsafe { <flatbuffers::ForwardsUOffset<TweedleDeeV1<'a>>>::follow(data.bytes(), 0) }
+    })
   }
   #[inline]
-  #[allow(non_snake_case)]
-  pub fn instruction_as_dee_v1(&self) -> Option<TweedleDeeV1<'a>> {
-    if self.instruction_type() == FlatlanaInstructionData::DeeV1 {
-      self.instruction().map(|t| {
-       // Safety:
-       // Created from a valid Table for this object
-       // Which contains a valid union in this slot
-       unsafe { TweedleDeeV1::init_from_table(t) }
-     })
-    } else {
-      None
-    }
+  pub fn dumv1(&self) -> Option<flatbuffers::Vector<'a, u8>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, u8>>>(FlatlanaInstruction::VT_DUMV1, None)}
   }
-
-  #[inline]
-  #[allow(non_snake_case)]
-  pub fn instruction_as_dum_v1(&self) -> Option<TweedleDumV1<'a>> {
-    if self.instruction_type() == FlatlanaInstructionData::DumV1 {
-      self.instruction().map(|t| {
-       // Safety:
-       // Created from a valid Table for this object
-       // Which contains a valid union in this slot
-       unsafe { TweedleDumV1::init_from_table(t) }
-     })
-    } else {
-      None
-    }
+  pub fn dumv1_nested_flatbuffer(&'a self) -> Option<TweedleDumV1<'a>> {
+    self.dumv1().map(|data| {
+      use flatbuffers::Follow;
+      // Safety:
+      // Created from a valid Table for this object
+      // Which contains a valid flatbuffer in this slot
+      unsafe { <flatbuffers::ForwardsUOffset<TweedleDumV1<'a>>>::follow(data.bytes(), 0) }
+    })
   }
-
 }
 
 impl flatbuffers::Verifiable for FlatlanaInstruction<'_> {
@@ -190,27 +185,25 @@ impl flatbuffers::Verifiable for FlatlanaInstruction<'_> {
   ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
     use self::flatbuffers::Verifiable;
     v.visit_table(pos)?
-     .visit_union::<FlatlanaInstructionData, _>("instruction_type", Self::VT_INSTRUCTION_TYPE, "instruction", Self::VT_INSTRUCTION, false, |key, v, pos| {
-        match key {
-          FlatlanaInstructionData::DeeV1 => v.verify_union_variant::<flatbuffers::ForwardsUOffset<TweedleDeeV1>>("FlatlanaInstructionData::DeeV1", pos),
-          FlatlanaInstructionData::DumV1 => v.verify_union_variant::<flatbuffers::ForwardsUOffset<TweedleDumV1>>("FlatlanaInstructionData::DumV1", pos),
-          _ => Ok(()),
-        }
-     })?
+     .visit_field::<InstructionType>("ix_type", Self::VT_IX_TYPE, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, u8>>>("deev1", Self::VT_DEEV1, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, u8>>>("dumv1", Self::VT_DUMV1, false)?
      .finish();
     Ok(())
   }
 }
-pub struct FlatlanaInstructionArgs {
-    pub instruction_type: FlatlanaInstructionData,
-    pub instruction: Option<flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>>,
+pub struct FlatlanaInstructionArgs<'a> {
+    pub ix_type: InstructionType,
+    pub deev1: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, u8>>>,
+    pub dumv1: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, u8>>>,
 }
-impl<'a> Default for FlatlanaInstructionArgs {
+impl<'a> Default for FlatlanaInstructionArgs<'a> {
   #[inline]
   fn default() -> Self {
     FlatlanaInstructionArgs {
-      instruction_type: FlatlanaInstructionData::NONE,
-      instruction: None,
+      ix_type: InstructionType::Unknown,
+      deev1: None,
+      dumv1: None,
     }
   }
 }
@@ -221,12 +214,16 @@ pub struct FlatlanaInstructionBuilder<'a: 'b, 'b> {
 }
 impl<'a: 'b, 'b> FlatlanaInstructionBuilder<'a, 'b> {
   #[inline]
-  pub fn add_instruction_type(&mut self, instruction_type: FlatlanaInstructionData) {
-    self.fbb_.push_slot::<FlatlanaInstructionData>(FlatlanaInstruction::VT_INSTRUCTION_TYPE, instruction_type, FlatlanaInstructionData::NONE);
+  pub fn add_ix_type(&mut self, ix_type: InstructionType) {
+    self.fbb_.push_slot::<InstructionType>(FlatlanaInstruction::VT_IX_TYPE, ix_type, InstructionType::Unknown);
   }
   #[inline]
-  pub fn add_instruction(&mut self, instruction: flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>) {
-    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(FlatlanaInstruction::VT_INSTRUCTION, instruction);
+  pub fn add_deev1(&mut self, deev1: flatbuffers::WIPOffset<flatbuffers::Vector<'b , u8>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(FlatlanaInstruction::VT_DEEV1, deev1);
+  }
+  #[inline]
+  pub fn add_dumv1(&mut self, dumv1: flatbuffers::WIPOffset<flatbuffers::Vector<'b , u8>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(FlatlanaInstruction::VT_DUMV1, dumv1);
   }
   #[inline]
   pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> FlatlanaInstructionBuilder<'a, 'b> {
@@ -246,27 +243,9 @@ impl<'a: 'b, 'b> FlatlanaInstructionBuilder<'a, 'b> {
 impl core::fmt::Debug for FlatlanaInstruction<'_> {
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     let mut ds = f.debug_struct("FlatlanaInstruction");
-      ds.field("instruction_type", &self.instruction_type());
-      match self.instruction_type() {
-        FlatlanaInstructionData::DeeV1 => {
-          if let Some(x) = self.instruction_as_dee_v1() {
-            ds.field("instruction", &x)
-          } else {
-            ds.field("instruction", &"InvalidFlatbuffer: Union discriminant does not match value.")
-          }
-        },
-        FlatlanaInstructionData::DumV1 => {
-          if let Some(x) = self.instruction_as_dum_v1() {
-            ds.field("instruction", &x)
-          } else {
-            ds.field("instruction", &"InvalidFlatbuffer: Union discriminant does not match value.")
-          }
-        },
-        _ => {
-          let x: Option<()> = None;
-          ds.field("instruction", &x)
-        },
-      };
+      ds.field("ix_type", &self.ix_type());
+      ds.field("deev1", &self.deev1());
+      ds.field("dumv1", &self.dumv1());
       ds.finish()
   }
 }

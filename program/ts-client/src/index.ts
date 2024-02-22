@@ -1,6 +1,7 @@
 import * as flatbuffers from "flatbuffers"
 import { AccountRole, Address, IInstruction, ReadonlyAccount, WritableAccount, address, getAddressEncoder, getProgramDerivedAddress } from "@solana/web3.js";
 import { FlatlanaInstruction, TweedleDeeV1 } from "flatlana-types";
+import { InstructionType } from "flatlana-types";
 export const PROG = "fLatK5NbbRdgjLJ9vAJqUP9VWJZcomvqcbsrsLPLK2R";
 
 
@@ -23,14 +24,19 @@ export class FlatlanaProgram {
       deeInt,
     } = params;
     const deeIntInt = deeInt | 0;
-    const builder = new flatbuffers.Builder(0);
+    let builder = new flatbuffers.Builder(0);
+    const str = builder.createString(deeString)
     TweedleDeeV1.startTweedleDeeV1(builder);
-    TweedleDeeV1.addTheString(builder, builder.createString(deeString));
+    TweedleDeeV1.addTheString(builder, str);
     TweedleDeeV1.addTheInt(builder, deeIntInt);
     const dee = TweedleDeeV1.endTweedleDeeV1(builder);
+    builder.finish(dee)
+    const deebuf = builder.asUint8Array();
+    builder = new flatbuffers.Builder(0);
+    const deev = FlatlanaInstruction.createDeev1Vector(builder, deebuf);
     FlatlanaInstruction.startFlatlanaInstruction(builder);
-    FlatlanaInstruction.addInstruction(builder, dee);
-    FlatlanaInstruction.addInstructionType(builder, 0);
+    FlatlanaInstruction.addDeev1(builder, deev);
+    FlatlanaInstruction.addIxType(builder, InstructionType.DeeV1);
     const ci = FlatlanaInstruction.endFlatlanaInstruction(builder);
     builder.finish(ci);
     const buf = builder.asUint8Array();

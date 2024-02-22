@@ -8,7 +8,7 @@ resolver = "2"
 [workspace.dependencies]
 flatbuffers = "23.5.26"
 thiserror = "1.0.57"
-solana-program = "1.17.18"
+solana-program = "=1.17.18"
 
 [workspace.lints.clippy]
 clone_on_ref_ptr = "deny"

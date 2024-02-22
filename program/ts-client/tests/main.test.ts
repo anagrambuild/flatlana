@@ -12,11 +12,10 @@ import {
   createSolanaRpc, generateKeyPair, createDefaultRpcTransport, address, getAddressFromPublicKey, createDefaultAirdropRequester, signature, getSignatureFromTransaction
 } from '@solana/web3.js';
 import { PROG, FlatlanaProgram } from "../src/index";
-import { randomBytes } from 'crypto';
 import { pipe } from '@solana/functional';
 import { createDefaultRpcSubscriptionsTransport } from '@solana/web3.js';
 
-describe('Flatlata', () => {
+describe('Flatlana', () => {
   it('should create valid TweedleDees', async () => {
     const keyPair = await generateKeyPair();
     const tsp = createDefaultRpcTransport({ url: Cluster.Development.apiUrl })
@@ -45,17 +44,30 @@ describe('Flatlata', () => {
     const s = createDefaultTransactionSender({
       rpc: api,
       rpcSubscriptions: sub
-    }) 
+    })
     const ctx = await api.getLatestBlockhash().send()
-    expect(() => {
-    const transaction = pipe(
-      createTransaction({ version: 0 }),
-      tx => setTransactionFeePayer(pub, tx),
-      tx => setTransactionLifetimeUsingBlockhash(ctx.value, tx),
-      tx => appendTransactionInstruction(result, tx),
-      async tx => signTransaction([keyPair], tx),
-      async tx => s(await tx, { commitment: "confirmed" })
-    );
+    expect(async () => {
+      const x = pipe(
+        createTransaction({ version: 0 }),
+        tx => setTransactionFeePayer(pub, tx),
+        tx => setTransactionLifetimeUsingBlockhash(ctx.value, tx),
+        tx => appendTransactionInstruction(result, tx),
+        async tx => signTransaction([keyPair], tx),
+        async tx => {
+          await s(await tx, { commitment: "confirmed" });
+          return tx;
+        },
+        async tx => api.getTransaction(getSignatureFromTransaction(await tx), {
+          commitment: "confirmed",
+            maxSupportedTransactionVersion: 0
+        }).send(),
+        async tx => {
+          console.log((await tx)?.meta?.logMessages)
+          return tx;
+        }
+      );
+      await x;
+      
     }).not.toThrow()
   })
 })

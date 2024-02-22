@@ -1,13 +1,16 @@
 include "./tweedle_dee.fbs"; 
 include "./tweedle_dum.fbs";
 
-union FlatlanaInstructionData {
-  DeeV1: TweedleDeeV1,
-  DumV1: TweedleDumV1,
+enum InstructionType: uint8 {
+  Unknown = 0,
+  DeeV1 = 1,
+  DumV1 = 2,
 } 
 
 table FlatlanaInstruction{
-  instruction: FlatlanaInstructionData;
+  ix_type: InstructionType;
+  deev1: [ubyte] (nested_flatbuffer: "TweedleDeeV1");
+  dumv1: [ubyte] (nested_flatbuffer: "TweedleDumV1");
 }
 
 root_type FlatlanaInstruction;

@@ -2,7 +2,7 @@
 #![cfg_attr(not(test), forbid(unsafe_code))]
 
 use flatlana_types::{
-     flatlana_instruction_generated::FlatlanaInstructionData, parse_ix_data,
+     flatlana_instruction_generated::{FlatlanaInstruction, InstructionType}, parse_ix_data, tweedle_dee_generated::root_as_tweedle_dee_v1, tweedle_dum_generated::root_as_tweedle_dum_v1
 };
 use solana_program::{
     account_info::AccountInfo, declare_id, entrypoint, entrypoint::ProgramResult, msg, program::invoke_signed, program_error::ProgramError, program_memory::sol_memcpy, pubkey::Pubkey, rent::Rent, system_instruction
@@ -36,14 +36,23 @@ pub fn process_instruction<'a>(
     instruction_data: &'a [u8],
 ) -> ProgramResult {
     let ix = parse_ix_data(instruction_data).map_err(|e| FlatlanaError::WetwareFault)?;
-    match ix.instruction_type() {
-        FlatlanaInstructionData::DeeV1 => {
-            if let Some(dee) = ix.instruction_as_dee_v1() {
+    match ix.ix_type() {
+        InstructionType::DeeV1 => {
+            msg!("DeeV1");
+            if let Some(dee) = ix.deev1_nested_flatbuffer() {
                 // example of saving the bytes using
-                let bump = 254;
+                let bump = Pubkey::find_program_address(
+                    &[
+                        &b"flatlana"[..],
+                        &accounts[0].key.to_bytes(),
+                    ],
+                    program_id,
+                ).1;
                 let seeds = &[&b"flatlana"[..], &accounts[0].key.to_bytes(), &[bump]];
                 // sneakily grab the underlying table at offset where dee starts
-                let bytes = dee._tab.buf();
+                
+                let bytes = ix.deev1().unwrap().bytes();
+                msg!("dee size : {:?} {:?}",bytes.len(), dee.the_string());
                 let space = bytes.len() as u64;
                 create_program_account(
                   &accounts[1],
@@ -52,13 +61,14 @@ pub fn process_instruction<'a>(
                   &accounts[0],
                   &accounts[2],
                   Some(0), // tip me always
-              )?;
+                )?;
                 let account_to_save = &accounts[1];
                 sol_memcpy(&mut account_to_save.data.borrow_mut(), bytes, bytes.len());
-                msg!("DeeV1");
+                let dee = root_as_tweedle_dee_v1(bytes).unwrap();
+                msg!("DeeV1: {:?}", dee);
             }
         }
-        FlatlanaInstructionData::DumV1 => {
+        InstructionType::DumV1 => {
             msg!("DumV1");
         }
         _ => {

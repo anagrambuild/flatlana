@@ -2,7 +2,7 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-import { FlatlanaInstructionData, unionToFlatlanaInstructionData, unionListToFlatlanaInstructionData } from './flatlana-instruction-data.js';
+import { InstructionType } from './instruction-type.js';
 
 
 export class FlatlanaInstruction {
@@ -23,26 +23,90 @@ static getSizePrefixedRootAsFlatlanaInstruction(bb:flatbuffers.ByteBuffer, obj?:
   return (obj || new FlatlanaInstruction()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 }
 
-instructionType():FlatlanaInstructionData {
+ixType():InstructionType {
   const offset = this.bb!.__offset(this.bb_pos, 4);
-  return offset ? this.bb!.readUint8(this.bb_pos + offset) : FlatlanaInstructionData.NONE;
+  return offset ? this.bb!.readUint8(this.bb_pos + offset) : InstructionType.Unknown;
 }
 
-instruction<T extends flatbuffers.Table>(obj:any):any|null {
+mutate_ix_type(value:InstructionType):boolean {
+  const offset = this.bb!.__offset(this.bb_pos, 4);
+
+  if (offset === 0) {
+    return false;
+  }
+
+  this.bb!.writeUint8(this.bb_pos + offset, value);
+  return true;
+}
+
+deev1(index: number):number|null {
   const offset = this.bb!.__offset(this.bb_pos, 6);
-  return offset ? this.bb!.__union(obj, this.bb_pos + offset) : null;
+  return offset ? this.bb!.readUint8(this.bb!.__vector(this.bb_pos + offset) + index) : 0;
+}
+
+deev1Length():number {
+  const offset = this.bb!.__offset(this.bb_pos, 6);
+  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
+}
+
+deev1Array():Uint8Array|null {
+  const offset = this.bb!.__offset(this.bb_pos, 6);
+  return offset ? new Uint8Array(this.bb!.bytes().buffer, this.bb!.bytes().byteOffset + this.bb!.__vector(this.bb_pos + offset), this.bb!.__vector_len(this.bb_pos + offset)) : null;
+}
+
+dumv1(index: number):number|null {
+  const offset = this.bb!.__offset(this.bb_pos, 8);
+  return offset ? this.bb!.readUint8(this.bb!.__vector(this.bb_pos + offset) + index) : 0;
+}
+
+dumv1Length():number {
+  const offset = this.bb!.__offset(this.bb_pos, 8);
+  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
+}
+
+dumv1Array():Uint8Array|null {
+  const offset = this.bb!.__offset(this.bb_pos, 8);
+  return offset ? new Uint8Array(this.bb!.bytes().buffer, this.bb!.bytes().byteOffset + this.bb!.__vector(this.bb_pos + offset), this.bb!.__vector_len(this.bb_pos + offset)) : null;
 }
 
 static startFlatlanaInstruction(builder:flatbuffers.Builder) {
-  builder.startObject(2);
+  builder.startObject(3);
 }
 
-static addInstructionType(builder:flatbuffers.Builder, instructionType:FlatlanaInstructionData) {
-  builder.addFieldInt8(0, instructionType, FlatlanaInstructionData.NONE);
+static addIxType(builder:flatbuffers.Builder, ixType:InstructionType) {
+  builder.addFieldInt8(0, ixType, InstructionType.Unknown);
 }
 
-static addInstruction(builder:flatbuffers.Builder, instructionOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(1, instructionOffset, 0);
+static addDeev1(builder:flatbuffers.Builder, deev1Offset:flatbuffers.Offset) {
+  builder.addFieldOffset(1, deev1Offset, 0);
+}
+
+static createDeev1Vector(builder:flatbuffers.Builder, data:number[]|Uint8Array):flatbuffers.Offset {
+  builder.startVector(1, data.length, 1);
+  for (let i = data.length - 1; i >= 0; i--) {
+    builder.addInt8(data[i]!);
+  }
+  return builder.endVector();
+}
+
+static startDeev1Vector(builder:flatbuffers.Builder, numElems:number) {
+  builder.startVector(1, numElems, 1);
+}
+
+static addDumv1(builder:flatbuffers.Builder, dumv1Offset:flatbuffers.Offset) {
+  builder.addFieldOffset(2, dumv1Offset, 0);
+}
+
+static createDumv1Vector(builder:flatbuffers.Builder, data:number[]|Uint8Array):flatbuffers.Offset {
+  builder.startVector(1, data.length, 1);
+  for (let i = data.length - 1; i >= 0; i--) {
+    builder.addInt8(data[i]!);
+  }
+  return builder.endVector();
+}
+
+static startDumv1Vector(builder:flatbuffers.Builder, numElems:number) {
+  builder.startVector(1, numElems, 1);
 }
 
 static endFlatlanaInstruction(builder:flatbuffers.Builder):flatbuffers.Offset {
@@ -58,10 +122,11 @@ static finishSizePrefixedFlatlanaInstructionBuffer(builder:flatbuffers.Builder, 
   builder.finish(offset, undefined, true);
 }
 
-static createFlatlanaInstruction(builder:flatbuffers.Builder, instructionType:FlatlanaInstructionData, instructionOffset:flatbuffers.Offset):flatbuffers.Offset {
+static createFlatlanaInstruction(builder:flatbuffers.Builder, ixType:InstructionType, deev1Offset:flatbuffers.Offset, dumv1Offset:flatbuffers.Offset):flatbuffers.Offset {
   FlatlanaInstruction.startFlatlanaInstruction(builder);
-  FlatlanaInstruction.addInstructionType(builder, instructionType);
-  FlatlanaInstruction.addInstruction(builder, instructionOffset);
+  FlatlanaInstruction.addIxType(builder, ixType);
+  FlatlanaInstruction.addDeev1(builder, deev1Offset);
+  FlatlanaInstruction.addDumv1(builder, dumv1Offset);
   return FlatlanaInstruction.endFlatlanaInstruction(builder);
 }
 }

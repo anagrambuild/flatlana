@@ -5,8 +5,6 @@
     "lint": "eslint src/ --ext .js,.jsx,.ts,.tsx",
     "test": "jest --silent=false --watchAll",
     "clean": "rm -rf dist build package",
-    "ts-node": "ts-node",
-    "docs": "typedoc --entryPoints src/main.ts",
     "build": "tsc -p tsconfig.json",
     "build-all": "pnpm run clean && pnpm run build && pnpm run build-browser",
     "build-browser": "esbuild src/index.ts --bundle --minify --sourcemap=external --outfile=dist/esbuild/browser.js"
