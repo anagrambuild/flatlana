@@ -38,7 +38,6 @@ pub fn process_instruction<'a>(
     let ix = parse_ix_data(instruction_data).map_err(|e| FlatlanaError::WetwareFault)?;
     match ix.ix_type() {
         InstructionType::DeeV1 => {
-            msg!("DeeV1");
             if let Some(dee) = ix.deev1_nested_flatbuffer() {
                 // example of saving the bytes using
                 let bump = Pubkey::find_program_address(
@@ -52,7 +51,6 @@ pub fn process_instruction<'a>(
                 // sneakily grab the underlying table at offset where dee starts
                 
                 let bytes = ix.deev1().unwrap().bytes();
-                msg!("dee size : {:?} {:?}",bytes.len(), dee.the_string());
                 let space = bytes.len() as u64;
                 create_program_account(
                   &accounts[1],
@@ -65,11 +63,9 @@ pub fn process_instruction<'a>(
                 let account_to_save = &accounts[1];
                 sol_memcpy(&mut account_to_save.data.borrow_mut(), bytes, bytes.len());
                 let dee = root_as_tweedle_dee_v1(bytes).unwrap();
-                msg!("DeeV1: {:?}", dee);
             }
         }
         InstructionType::DumV1 => {
-            msg!("DumV1");
         }
         _ => {
             return Err(FlatlanaError::WetwareFault.into());
